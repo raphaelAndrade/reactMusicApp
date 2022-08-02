@@ -4,13 +4,13 @@ import { Container, PageItem, Link } from './styles'
 interface IPaginationProps {
     itemPerPage: number;
     totalItems: number;
-    paginate: any
+    paginate: (pageNumber: number) => void
 }
 
 const Pagination: React.FC<IPaginationProps> = ({
     itemPerPage, totalItems, paginate
 }) => {
-    const pageNumbers: any = [];
+    const pageNumbers: number[] = [];
 
     for (let i = 1; i <= Math.ceil(totalItems / itemPerPage); i++) {
         pageNumbers.push(i)

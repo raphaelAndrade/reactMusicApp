@@ -9,6 +9,7 @@ import { Container, LoadingContainer } from './styles';
 
 const App = () => {
   const [dataBase, setDatabase] = useState<IDataBase | any>();
+  
   //Pagination
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,27 +20,29 @@ const App = () => {
   const urlAlbums = 'http://localhost:5001/albums';
   const urlArtist = 'http://localhost:5001/artists';
 
-  var dataBaseLegal: any = []
+  var artistDataBase: any = []
+
+  const token: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
 
   const getAllSongs = async () => {
     setLoading(true);
     // get all songs
-    await axios.get(`${urlSongs}`).then(response => {
+    await axios.get(`${urlSongs}`, { headers: {"Authorization" : `Bearer ${token}`} } ).then(response => {
       const allSongs = response.data;
       //get album
       allSongs.map((song: songs) => {
-        axios.get(`${urlAlbums}/${song.album_id}`).then(response => {
+        axios.get(`${urlAlbums}/${song.album_id}`, { headers: {"Authorization" : `Bearer ${token}`} } ).then(response => {
           const album = response.data;
-          axios.get(`${urlArtist}/${album.artist_id}`).then(response => {
+          axios.get(`${urlArtist}/${album.artist_id}`, { headers: {"Authorization" : `Bearer ${token}`} } ).then(response => {
             const artist = response.data;
-            dataBaseLegal.push(
+            artistDataBase.push(
               {
                 ...song,
                 album,
                 artist
               }
             );
-            setDatabase([...dataBaseLegal]);
+            setDatabase([...artistDataBase]);
             setLoading(false);
           })
         })
@@ -54,10 +57,11 @@ const App = () => {
   // Get current items
   const indexOfLastItem: number = currentPage * itemPerPages;
   const indexOfFirstItem: number = indexOfLastItem - itemPerPages;
-  const currentItems: any = dataBase?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems: IDataBase[] = dataBase?.slice(indexOfFirstItem, indexOfLastItem);
 
+   // Sort Items
   const sort = (column: string) => {
-    const newDb = _.orderBy(dataBase, [column], 'desc');
+    const newDb = _.orderBy(dataBase, [column], ['desc', 'asc']);
     setDatabase(newDb);
 };
 
